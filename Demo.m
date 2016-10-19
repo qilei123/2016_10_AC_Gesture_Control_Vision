@@ -159,7 +159,7 @@ while runLoop && frameCount < 4000
                 bbox(1,3) = widthofFrame - bbox(1,1);
             end
             if bbox(1,2)+bbox(1,4)> hightofFrame
-                bbox(1,2) = hightofFrame - bbox(1,2);
+                bbox(1,4) = hightofFrame - bbox(1,2);
             end
             points = detectMinEigenFeatures(videoFrameGray, 'ROI', bbox(1, :));
             
