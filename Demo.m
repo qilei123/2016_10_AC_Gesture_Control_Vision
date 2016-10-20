@@ -138,23 +138,25 @@ while runLoop && frameCount < 4000
            bin(findex1:findex2,findex3:findex4) =0;
         end
         
-        L = bwlabeln(bin, 8);
-        S = regionprops(L, 'Area');
-        P = 1000;
-        bw2 = ismember(L, find([S.Area] >= P));
-        L2 = bwlabeln(bw2, 8);
-        STATS = regionprops(L2,'Centroid','MajorAxisLength','MinorAxisLength');
-        %figure;imshow(bw2);
-        if length(STATS) >0
-            maxMajorIndex = 1;
-            maxMajorAxisLength = STATS(maxMajorIndex).MajorAxisLength;
-            for StateIndex=1:length(STATS)
-                if maxMajorAxisLength < STATS(StateIndex).MajorAxisLength
-                    maxMajorIndex = StateIndex;
-                    maxMajorAxisLength = STATS(StateIndex).MajorAxisLength;
+        if ~isempty(fbox)
+            L = bwlabeln(bin, 8);
+            S = regionprops(L, 'Area');
+            P = 1000;
+            bw2 = ismember(L, find([S.Area] >= P));
+            L2 = bwlabeln(bw2, 8);
+            STATS = regionprops(L2,'Centroid','MajorAxisLength','MinorAxisLength');
+            %figure;imshow(bw2);
+            if length(STATS) >0
+                maxMajorIndex = 1;
+                maxMajorAxisLength = STATS(maxMajorIndex).MajorAxisLength;
+                for StateIndex=1:length(STATS)
+                    if maxMajorAxisLength < STATS(StateIndex).MajorAxisLength
+                        maxMajorIndex = StateIndex;
+                        maxMajorAxisLength = STATS(StateIndex).MajorAxisLength;
+                    end
                 end
+                bbox = [floor(STATS(maxMajorIndex).Centroid(1)-(STATS(maxMajorIndex).MinorAxisLength+20)/2) floor(STATS(maxMajorIndex).Centroid(2)-(STATS(maxMajorIndex).MinorAxisLength+20)/2) floor(STATS(maxMajorIndex).MinorAxisLength+20) floor(STATS(maxMajorIndex).MinorAxisLength+20)];
             end
-            bbox = [floor(STATS(maxMajorIndex).Centroid(1)-(STATS(maxMajorIndex).MinorAxisLength+20)/2) floor(STATS(maxMajorIndex).Centroid(2)-(STATS(maxMajorIndex).MinorAxisLength+20)/2) floor(STATS(maxMajorIndex).MinorAxisLength+20) floor(STATS(maxMajorIndex).MinorAxisLength+20)];
         end
 
         if isempty(fbox)
