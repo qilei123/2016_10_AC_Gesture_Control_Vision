@@ -46,7 +46,9 @@ HandGestures(0);
 clear cam;
 
 % Create the Object detector object.
-ObjectDetector = vision.CascadeObjectDetector();
+faceDetector = vision.CascadeObjectDetector();
+% noseDetector is more precise than face
+noseDetector = vision.CascadeObjectDetector('Nose', 'UseROI', true);
 
 % Create the point tracker object.
 pointTracker = vision.PointTracker('MaxBidirectionalError', 2);
@@ -92,6 +94,8 @@ ison = false;
 
 [hightofFrame widthofFrame]=size(snapshot(cam));
 
+scaleForSpeed = 0.4;
+
 while runLoop && frameCount < 4000
     
     % Get the next frame.
@@ -101,15 +105,24 @@ while runLoop && frameCount < 4000
     countFrequence = countFrequence+1;
     if numPts < 10
         % Detection mode.
-        fbox = ObjectDetector.step(videoFrameGray);
+        facebox = faceDetector.step(imresize(videoFrameGray,scaleForSpeed));
+        if ~isempty(facebox)
+            nbox = step(noseDetector, imresize(videoFrame,scaleForSpeed), facebox(1,:));
+            fbox = nbox/scaleForSpeed;
+        else
+            nbox = [];
+            fbox = nbox;
+        end
+        
+        
         bbox = [];        
         [out bin] = generate_skinmap(videoFrame);
         %figure; imshow(bin);
         if ~isempty(fbox)
-           findex1 =  fbox(2)-20;
-           findex2 =  fbox(2)+fbox(4)+50;
-           findex3 =  fbox(1)-20;
-           findex4 =  fbox(1)+fbox(3)+20;
+           findex1 =  fbox(2)-60;
+           findex2 =  fbox(2)+fbox(4)+60;
+           findex3 =  fbox(1)-60;
+           findex4 =  fbox(1)+fbox(3)+50;
            if findex1 < 0
                findex1 = 1;
            end
@@ -124,6 +137,7 @@ while runLoop && frameCount < 4000
            end           
            bin(findex1:findex2,findex3:findex4) =0;
         end
+        
         L = bwlabeln(bin, 8);
         S = regionprops(L, 'Area');
         P = 1000;
@@ -339,4 +353,3 @@ release(ObjectDetector);
 displayEndOfDemoMessage(mfilename)
 
 %end
-
