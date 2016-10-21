@@ -1,5 +1,4 @@
-%function  HandTrackingWebcam(varargin)
-function Demo
+%function Demo
 %% Hand Detection and Tracking Using Live Video Acquisition
 
 %% Overview
@@ -51,7 +50,7 @@ faceDetector = vision.CascadeObjectDetector();
 noseDetector = vision.CascadeObjectDetector('Nose', 'UseROI', true);
 
 % Create the point tracker object.
-pointTracker = vision.PointTracker('MaxBidirectionalError', 2);
+pointTracker = vision.PointTracker('MaxBidirectionalError', 2, 'NumPyramidLevels', 5);
 
 % Create the webcam object.
 cam = webcam();
@@ -113,7 +112,6 @@ while runLoop && frameCount < 4000
             nbox = [];
             fbox = nbox;
         end
-        
         
         bbox = [];        
         [out bin] = generate_skinmap(videoFrame);
@@ -332,7 +330,8 @@ clear cam;
 close(myObj);
 release(videoPlayer);
 release(pointTracker);
-release(ObjectDetector);
+release(faceDetector);
+release(noseDetector);
 
 %% References
 % Viola, Paul A. and Jones, Michael J. "Rapid Object Detection using a
